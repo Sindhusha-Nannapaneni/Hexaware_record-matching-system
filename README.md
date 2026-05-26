@@ -1,20 +1,19 @@
-# Record Matching System
+Record Matching System (CRM ↔ Calendar)
+🔍 Overview
 
-## Overview
+This project implements an intelligent record matching system that links CRM records with Calendar events using a rule-based similarity engine.
 
-This project builds a record matching system between CRM records and Calendar events.
+The system identifies whether two records refer to the same real-world meeting using:
 
-The system:
-- Loads data from JSON files
-- Matches records across sources
-- Calculates confidence scores
-- Evaluates predictions against labeled data
-- Exposes predictions through a REST API
+Temporal similarity
+Text similarity
+Company alignment
+Attendee matching
+Weighted scoring + strict filtering
 
----
+It is exposed via a FastAPI REST service and supports batch pipeline evaluation.
 
-## Project Structure
-
+🏗️ Project Architecture
 record-matching-system/
 │
 ├── data/
@@ -25,114 +24,87 @@ record-matching-system/
 ├── src/
 │   ├── api.py
 │   ├── loader.py
-│   ├── preprocess.py
 │   ├── features.py
 │   ├── matcher.py
-│   └── evaluator.py
-│
-├── results/
+│   ├── evaluator.py
 │
 ├── run_pipeline.py
 ├── run_api.py
 ├── requirements.txt
-├── README.md
-└── .gitignore
-
----
-
-## Setup
-
-Install dependencies:
-
-```bash
+└── README.md
+⚙️ Setup Instructions
+Install dependencies
 pip install -r requirements.txt
-```
-
----
-
-## Run Matching Pipeline
-
-```bash
+▶️ Running the Pipeline
 python run_pipeline.py
-```
-
-This runs:
-- data ingestion
-- preprocessing
-- matching
-- evaluation
-
----
-
-## Run API
-
-```bash
+Pipeline Steps:
+Load CRM and Calendar data
+Preprocess text and datetime fields
+Generate candidate pairs (filtering)
+Compute similarity scores
+Predict matches
+Evaluate performance
+🚀 Running the API
 python run_api.py
-```
 
 Swagger UI:
 
 http://127.0.0.1:8000/docs
+🧠 Matching Approach
 
----
+The system uses a two-stage hybrid heuristic model:
 
-## Matching Approach
+1. Candidate Filtering (Hard Gate)
 
-The matching system uses a weighted scoring approach based on:
+A pair is considered only if at least 2 of 3 signals are strong:
 
-- Time similarity
-- Attendee similarity
-- Company similarity
-- Text similarity
-- Location similarity
+Time proximity
+Text similarity
+Company similarity
+2. Weighted Scoring Model
 
-Each feature contributes to a final confidence score.
+Final confidence is computed using:
 
----
+Time similarity → 45%
+Text similarity → 30%
+Company similarity → 20%
+Attendee match → 5%
+📊 Evaluation Results
+Precision : 0.889
+Recall    : 0.85
+F1 Score  : 0.869
+🧩 Key Features
+Handles missing and noisy data
+Supports multiple datetime formats
+Normalizes virtual meeting locations
+Prevents false positive matching using strict gating
+Scalable rule-based architecture
+⚖️ Design Decisions
+Why rule-based approach?
+Small dataset
+High interpretability required
+Fast debugging and iteration
+No training data required
+Why two-stage filtering?
+Improves precision significantly
+Reduces noise from weak similarity pairs
+Mimics production-grade entity matching systems
+🧪 Limitations
+No machine learning model (pure heuristic)
+Performance depends on threshold tuning
+Limited to structured fields only
+🔮 Future Improvements
+Replace similarity rules with embeddings (SBERT / OpenAI embeddings)
+Add ML classifier on top of features
+Improve entity resolution using clustering
+Add logging + monitoring for API
+🤖 AI Assistance
 
-## Handling Bad Data
+AI tools were used for:
 
-The system handles:
-- Missing values
-- Different datetime formats
-- Timezone inconsistencies
-- Virtual meeting normalization
-- Duplicate calendar events
+Code structuring
+Debugging pipeline issues
+Improving feature engineering
+Documentation drafting
 
----
-
-## Evaluation Results
-
-Final Metrics:
-
-- Precision: 1.00
-- Recall: 0.75
-- F1 Score: 0.857
-
----
-
-## Assumptions
-
-- Records close in time are more likely to match
-- Company and attendee similarity are strong indicators
-- Virtual meeting locations are normalized
-
----
-
-## Tradeoffs
-
-A heuristic-based approach was chosen instead of a trained ML model because:
-- Dataset size is small
-- Rules are interpretable
-- Faster implementation and debugging
-
----
-
-## AI Tool Usage
-
-AI coding assistants were used to help with:
-- project structuring
-- debugging
-- boilerplate generation
-
-Generated code was reviewed and modified during implementation.
+All final logic was validated and tested manually.

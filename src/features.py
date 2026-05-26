@@ -1,67 +1,32 @@
-from fuzzywuzzy import fuzz
+from dateutil import parser
+import re
 
+def normalize_text(text):
+    if not text:
+        return ""
+    return re.sub(r"\s+", " ", text.lower().strip())
 
-def text_similarity(a, b):
-
-    if not a or not b:
-        return 0
-
-    return fuzz.token_set_ratio(a, b) / 100
-
-
-def time_similarity(t1, t2):
-
-    if not t1 or not t2:
-        return 0.5
-
+def parse_datetime(date, time=None):
     try:
-        # Remove timezone info if present
-        t1 = t1.replace(tzinfo=None)
-        t2 = t2.replace(tzinfo=None)
+        if not date:
+            return None
 
-        diff_hours = abs((t1 - t2).total_seconds()) / 3600
+        if time:
+            dt = parser.parse(f"{date} {time}")
+        else:
+            dt = parser.parse(date)
 
-        return max(0, 1 - (diff_hours / 24))
-
+        return dt.replace(tzinfo=None)
     except:
-        return 0
+        return None
 
+def normalize_location(location):
+    if not location:
+        return "unknown"
 
-def attendee_similarity(client_name, attendees):
+    location = location.lower()
 
-    if not client_name or not attendees:
-        return 0
+    if any(x in location for x in ["zoom", "teams", "virtual"]):
+        return "virtual"
 
-    client_name = client_name.lower()
-
-    for attendee in attendees:
-
-        attendee = attendee.lower()
-
-        if client_name.replace(" ", ".") in attendee:
-            return 1
-
-    return 0
-
-
-def location_similarity(l1, l2):
-
-    if not l1 or not l2:
-        return 0
-
-    l1 = l1.lower()
-    l2 = l2.lower()
-
-    if l1 == l2:
-        return 1
-
-    if "virtual" in l1 and "virtual" in l2:
-        return 1
-
-    if "zoom" in l1 and "zoom" in l2:
-        return 1
-
-    if "teams" in l1 and "teams" in l2:
-        return 1
-
-    return 0
+    return location.strip()
