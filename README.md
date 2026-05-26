@@ -32,12 +32,15 @@ record-matching-system/
 ├── requirements.txt
 └── README.md
 
+
 **Setup Instructions**
 Install dependencies
 pip install -r requirements.txt
 
+
 **Running the Pipeline**
 python run_pipeline.py
+
 
 **Pipeline Steps:**
 Load CRM and Calendar data
@@ -47,11 +50,14 @@ Compute similarity scores
 Predict matches
 Evaluate performance
 
+
 **Running the API**
 python run_api.py
 
+
 **Swagger UI:**
 http://127.0.0.1:8000/docs
+
 
 **Matching Approach**
 The system uses a two-stage hybrid heuristic model:
@@ -67,11 +73,13 @@ Final confidence is computed using:
 - Text similarity → 30%
 - Company similarity → 20%
 - Attendee match → 5%
+
   
 **Evaluation Results**
 Precision : 0.889
 Recall    : 0.85
 F1 Score  : 0.869
+
 
 **Key Features**
 Handles missing and noisy data
@@ -80,6 +88,7 @@ Normalizes virtual meeting locations
 Prevents false positive matching using strict gating
 Scalable rule-based architecture
 
+
 **Design Decisions**
 Why rule-based approach?
 Small dataset
@@ -87,15 +96,18 @@ High interpretability required
 Fast debugging and iteration
 No training data required
 
+
 **Why two-stage filtering?**
 Improves precision significantly
 Reduces noise from weak similarity pairs
 Mimics production-grade entity matching systems
 
+
 **Limitations**
 No machine learning model (pure heuristic)
 Performance depends on threshold tuning
 Limited to structured fields only
+
 
 **Future Improvements**
 Replace similarity rules with embeddings (SBERT / OpenAI embeddings)
